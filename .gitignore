@@ -1,0 +1,14 @@
+# Ignore credentials and auth tokens
+credentials.json
+token.pickle
+token.json
+
+# Python cache and environment
+__pycache__/
+*.pyc
+.env
+
+# OS/IDE junk
+.DS_Store
+.vscode/
+.idea/
