@@ -12,11 +12,11 @@ if not os.path.exists("credentials.json"):
 else:
     print("✅ credentials.json found. Proceeding...")
 
-genai.configure(api_key="GEMINI_API_KEY")  # Replace with your Gemini key
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))  # Replace with your Gemini key
 model = genai.GenerativeModel("models/gemini-2.5-flash")
 
 SCOPES = ['https://www.googleapis.com/auth/blogger']
-BLOG_ID = "BLOGGER_ID"  # Replace with your blog ID
+BLOG_ID = os.getenv("BLOG_ID")  # Replace with your blog ID
 
 def get_blogger_service():
     creds = None
