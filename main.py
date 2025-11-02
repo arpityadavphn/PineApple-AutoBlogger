@@ -12,14 +12,11 @@ if not os.path.exists("credentials.json"):
 else:
     print("✅ credentials.json found. Proceeding...")
 
-# ---- 🔹 Gemini API Setup ----
-genai.configure(api_key="AIzaSyDZftPJwCeC5Sfq7QsIH8oKWB4DKoa6ojk")  # Replace with your Gemini key
-model = genai.GenerativeModel("models/gemini-2.5-flash")  # lightweight, faster
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))  # Replace with your Gemini key
+model = genai.GenerativeModel("models/gemini-2.5-flash")
 
-
-# ---- 🔹 Blogger Setup ----
 SCOPES = ['https://www.googleapis.com/auth/blogger']
-BLOG_ID = "6050293759550624438"  # Replace with your blog ID
+BLOG_ID = os.getenv("BLOG_ID")  # Replace with your blog ID
 
 def get_blogger_service():
     creds = None
@@ -38,7 +35,7 @@ def get_blogger_service():
     return service
 
 
-# ---- 1️⃣ Fetch Today’s Indian Birthdays ----
+
 def get_today_birthdays():
     query = """
     SELECT ?person ?personLabel ?dob (SAMPLE(?desc) AS ?occupation) (SAMPLE(?wikiLink) AS ?wikiLink)
@@ -85,7 +82,6 @@ def get_today_birthdays():
     return pd.DataFrame(records)
 
 
-# ---- 2️⃣ Wikipedia Page Length ----
 def get_wikipedia_page_length(title):
     url = "https://en.wikipedia.org/w/api.php"
     params = {"action": "query", "titles": title, "prop": "info", "format": "json"}
@@ -100,7 +96,6 @@ def get_wikipedia_page_length(title):
     return 0
 
 
-# ---- 3️⃣ Compute Importance ----
 def compute_importance(df):
     df['pageLength'] = [
         get_wikipedia_page_length(link.split("/wiki/")[-1]) if link else 0
@@ -114,7 +109,6 @@ def compute_importance(df):
     return df.sort_values(by='importanceScore', ascending=False)
 
 
-# ---- 4️⃣ Generate Article ----
 def generate_article(person):
     prompt = f"""
     Write a detailed, fact-based, magazine-style 600-word article about {person['name']},
@@ -143,14 +137,14 @@ def publish_to_blogger(service, title, content):
         print(f"❌ Failed to publish {title}: {e}")
 
 
-# ---- 6️⃣ Main Flow ----
+
 if __name__ == "__main__":
-    print("🚀 Fetching today's Indian birthdays...")
+    print("Fetching today's Indian birthdays...")
     df = get_today_birthdays()
     df = compute_importance(df)
     top5 = df.head(5)
 
-    print("\n🎯 Top 5 Influential Indians Born Today:")
+    print("\n Top 5 Influential Indians Born Today:")
     print(top5[['name', 'desc', 'importanceScore']])
 
     blogger_service = get_blogger_service()
